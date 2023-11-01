@@ -1,8 +1,8 @@
-import React from 'react'
-import { render, screen } from '@testing-library/react';
-import App from './App';
+import React from "react";
+import { render, screen } from "@testing-library/react";
+import App from "./App";
 
-test('renders basic inputs and buttons on new to-do list', () => {
+test("renders basic inputs and buttons on new to-do list", () => {
   render(<App />);
   const titleElement = screen.getByPlaceholderText("To-do list title");
   expect(titleElement).toBeInTheDocument();
