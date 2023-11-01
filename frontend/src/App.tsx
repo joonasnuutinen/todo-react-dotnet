@@ -1,6 +1,6 @@
-import { useEffect, useReducer } from 'react';
+import React, { useEffect, useReducer } from 'react';
 import TodoList from './components/TodoList';
-import { ActionKind, initialState, reducer } from './reducer';
+import { Action, ActionKind, State, initialState, reducer } from './reducer';
 import { TodoListType } from './types';
 
 const isValidGuid = (candidate: string) => {
@@ -14,7 +14,7 @@ async function fetchLists() {
   console.table('todo lists', data);
 }
 
-async function fetchList(listId: string, dispatch: Function) {
+async function fetchList(listId: string, dispatch: React.Dispatch<React.ReducerAction<React.Reducer<State, Action>>>) {
   const res = await fetch(`/api/todo/${listId}`);
   if (res.status === 404) {
     dispatch({ type: ActionKind.NEW_LIST, id: listId });
