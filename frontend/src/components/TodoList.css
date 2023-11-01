@@ -1,0 +1,68 @@
+#todoListContainer {
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+    padding: 30px;
+    background-color: white;
+}
+
+#todoListContainer > form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+        "title title"
+        "content content"
+        "buttonsleft buttonsright";
+}
+
+#todoListContainer input {
+    border: none;
+    padding: 2px;
+}
+
+#todoListContainer input:focus,
+#todoListContainer input:placeholder-shown {
+    border: 1px solid black;
+}
+
+#todoListName {
+    font-size: larger;
+    grid-area: title;
+    justify-self: center;
+}
+
+#itemList {
+    list-style-type: none;
+    grid-area: content;
+    justify-self: center;
+}
+
+.todoItemBlock {
+    border: 1px solid lightgray;
+    padding: 5px;
+    margin: 5px;
+    white-space: nowrap;
+}
+
+.todoItemInput {
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+#addButton {
+    grid-area: buttonsleft;
+    margin: 20px;
+    padding: 10px;
+}
+
+#saveButton {
+    grid-area: buttonsright;
+    margin: 20px;
+    padding: 10px;
+}
+
+.todoItemButton {
+    margin-left: 5px;
+    margin-right: 5px;
+}
