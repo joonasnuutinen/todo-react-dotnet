@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./TodoList.css";
 import { useTodo, useTodoDispatch, ActionKind } from "../TodoContext";
 import type { TodoListType } from "../types";
@@ -37,6 +37,28 @@ const getCurrentOrNewListId = () => {
   }
 };
 
+interface SavingInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  onDone: () => Promise<void>;
+}
+
+const SavingInput = ({ onDone, ...props }: SavingInputProps) => {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  return (
+    <input
+      ref={inputRef}
+      onBlur={() => onDone()}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" && inputRef.current) {
+          e.preventDefault();
+          inputRef.current.blur();
+          e.target.dispatchEvent(new FocusEvent("blur"));
+        }
+      }}
+      {...props}
+    />
+  );
+};
+
 const TodoList = () => {
   const state = useTodo();
   const dispatch = useTodoDispatch();
@@ -67,9 +89,9 @@ const TodoList = () => {
   const { saved, list } = state;
 
   const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>,
+    e?: React.FormEvent<HTMLFormElement>,
   ): Promise<void> => {
-    e.preventDefault();
+    e?.preventDefault();
     const res = await fetch(`/api/todo/${state.list.id}`, {
       method: "POST",
       body: JSON.stringify(state.list),
@@ -85,7 +107,7 @@ const TodoList = () => {
         <div>Loading</div>
       ) : (
         <form onSubmit={handleSubmit}>
-          <input
+          <SavingInput
             type="text"
             id="todoListName"
             placeholder="To-do list title"
@@ -96,6 +118,7 @@ const TodoList = () => {
                 name: e.target.value,
               })
             }
+            onDone={() => handleSubmit()}
           />
           <ul id="itemList">
             {list.items
