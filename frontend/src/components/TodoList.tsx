@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "./TodoList.css";
 import {
   useTodo,
@@ -51,6 +51,7 @@ const getCurrentOrNewListId = () => {
 const TodoList = () => {
   const state = useTodo();
   const dispatch = useTodoDispatch();
+  const [loading, setLoading] = useState(true);
 
   if (!state || !dispatch) return null;
 
@@ -62,9 +63,9 @@ const TodoList = () => {
       window.history.pushState({}, "", url);
     }
 
-    fetchLists();
+    // fetchLists();
 
-    fetchList(listId, dispatch);
+    fetchList(listId, dispatch).then(() => setLoading(false));
   }, [dispatch]);
 
   const { saved, list } = state;
@@ -84,102 +85,106 @@ const TodoList = () => {
 
   return (
     <div id="todoListContainer">
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          id="todoListName"
-          placeholder="To-do list title"
-          value={list.name}
-          onChange={(e) =>
-            dispatch({
-              type: ActionKind.LIST_NAME_CHANGED,
-              name: e.target.value,
-            })
-          }
-        />
-        <ul id="itemList">
-          {list.items
-            ?.slice()
-            .sort((a, b) => a.order - b.order)
-            .map((i) => (
-              <li key={i.id}>
-                <div className="todoItemBlock">
-                  <input
-                    type="checkbox"
-                    checked={i.done}
-                    onChange={(e) =>
-                      dispatch({
-                        type: ActionKind.ITEM_STATE_CHANGED,
-                        id: i.id,
-                        checked: e.target.checked,
-                      })
-                    }
-                  />
-                  <input
-                    type="text"
-                    className="todoItemInput"
-                    placeholder="New to-do item"
-                    value={i.description}
-                    onChange={(e) =>
-                      dispatch({
-                        type: ActionKind.ITEM_TEXT_CHANGED,
-                        id: i.id,
-                        text: e.target.value,
-                      })
-                    }
-                  />
-                  <button
-                    type="button"
-                    className="todoItemButton"
-                    onClick={() =>
-                      dispatch({
-                        type: ActionKind.ITEM_MOVED,
-                        id: i.id,
-                        oldPosition: i.order,
-                        newPosition: i.order - 1,
-                      })
-                    }
-                  >
-                    Move up
-                  </button>
-                  <button
-                    type="button"
-                    className="todoItemButton"
-                    onClick={() =>
-                      dispatch({
-                        type: ActionKind.ITEM_MOVED,
-                        id: i.id,
-                        oldPosition: i.order,
-                        newPosition: i.order + 1,
-                      })
-                    }
-                  >
-                    Move down
-                  </button>
-                  <button
-                    type="button"
-                    className="todoItemButton"
-                    onClick={() =>
-                      dispatch({ type: ActionKind.ITEM_REMOVED, id: i.id })
-                    }
-                  >
-                    Remove
-                  </button>
-                </div>
-              </li>
-            ))}
-        </ul>
-        <button
-          id="addButton"
-          type="button"
-          onClick={() => dispatch({ type: ActionKind.ITEM_ADDED })}
-        >
-          Add new item
-        </button>
-        <button id="saveButton" type="submit" disabled={saved}>
-          Save changes
-        </button>
-      </form>
+      {loading ? (
+        <div>Loading</div>
+      ) : (
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            id="todoListName"
+            placeholder="To-do list title"
+            value={list.name}
+            onChange={(e) =>
+              dispatch({
+                type: ActionKind.LIST_NAME_CHANGED,
+                name: e.target.value,
+              })
+            }
+          />
+          <ul id="itemList">
+            {list.items
+              ?.slice()
+              .sort((a, b) => a.order - b.order)
+              .map((i) => (
+                <li key={i.id}>
+                  <div className="todoItemBlock">
+                    <input
+                      type="checkbox"
+                      checked={i.done}
+                      onChange={(e) =>
+                        dispatch({
+                          type: ActionKind.ITEM_STATE_CHANGED,
+                          id: i.id,
+                          checked: e.target.checked,
+                        })
+                      }
+                    />
+                    <input
+                      type="text"
+                      className="todoItemInput"
+                      placeholder="New to-do item"
+                      value={i.description}
+                      onChange={(e) =>
+                        dispatch({
+                          type: ActionKind.ITEM_TEXT_CHANGED,
+                          id: i.id,
+                          text: e.target.value,
+                        })
+                      }
+                    />
+                    <button
+                      type="button"
+                      className="todoItemButton"
+                      onClick={() =>
+                        dispatch({
+                          type: ActionKind.ITEM_MOVED,
+                          id: i.id,
+                          oldPosition: i.order,
+                          newPosition: i.order - 1,
+                        })
+                      }
+                    >
+                      Move up
+                    </button>
+                    <button
+                      type="button"
+                      className="todoItemButton"
+                      onClick={() =>
+                        dispatch({
+                          type: ActionKind.ITEM_MOVED,
+                          id: i.id,
+                          oldPosition: i.order,
+                          newPosition: i.order + 1,
+                        })
+                      }
+                    >
+                      Move down
+                    </button>
+                    <button
+                      type="button"
+                      className="todoItemButton"
+                      onClick={() =>
+                        dispatch({ type: ActionKind.ITEM_REMOVED, id: i.id })
+                      }
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </li>
+              ))}
+          </ul>
+          <button
+            id="addButton"
+            type="button"
+            onClick={() => dispatch({ type: ActionKind.ITEM_ADDED })}
+          >
+            Add new item
+          </button>
+          <button id="saveButton" type="submit" disabled={saved}>
+            Save changes
+          </button>
+        </form>
+      )}
     </div>
   );
 };
