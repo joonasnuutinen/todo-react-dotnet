@@ -1,3 +1,9 @@
+import React, {
+  createContext,
+  useContext,
+  useReducer,
+  type PropsWithChildren,
+} from "react";
 import { TodoListType } from "./types";
 
 export type State = {
@@ -131,3 +137,26 @@ export const reducer = (state: State, action: Action) => {
       throw new Error();
   }
 };
+
+const TodoContext = createContext<State | null>(null);
+const TodoDispatchContext = createContext<React.Dispatch<Action> | null>(null);
+
+export function TodoProvider({ children }: PropsWithChildren<unknown>) {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  return (
+    <TodoContext.Provider value={state}>
+      <TodoDispatchContext.Provider value={dispatch}>
+        {children}
+      </TodoDispatchContext.Provider>
+    </TodoContext.Provider>
+  );
+}
+
+export function useTodo() {
+  return useContext(TodoContext);
+}
+
+export function useTodoDispatch() {
+  return useContext(TodoDispatchContext);
+}

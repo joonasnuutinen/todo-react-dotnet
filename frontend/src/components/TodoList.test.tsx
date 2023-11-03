@@ -24,19 +24,7 @@ test("save button is disabled when no unsaved changes are present", async () => 
     ],
   };
 
-  render(
-    <TodoList
-      todoList={todoList}
-      handleSubmit={() => {}}
-      itemAdded={() => {}}
-      itemRemoved={() => {}}
-      itemStateChanged={() => {}}
-      itemTextChanged={() => {}}
-      itemMoved={() => {}}
-      listNameChanged={() => {}}
-      unsavedChanges={false}
-    />,
-  );
+  render(<TodoList />);
 
   const saveButton = await screen.findByText("Save changes");
   expect(saveButton).toBeDisabled();
