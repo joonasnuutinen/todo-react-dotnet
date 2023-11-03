@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./TodoList.css";
-import {
-  useTodo,
-  useTodoDispatch,
-  ActionKind,
-  State,
-  Action,
-} from "../TodoContext";
+import { useTodo, useTodoDispatch, ActionKind } from "../TodoContext";
 import type { TodoListType } from "../types";
 
 const isValidGuid = (candidate: string) => {
@@ -21,17 +15,12 @@ async function fetchLists() {
   console.table("todo lists", data);
 }
 
-async function fetchList(
-  listId: string,
-  dispatch: React.Dispatch<React.ReducerAction<React.Reducer<State, Action>>>,
-) {
+async function fetchList(listId: string): Promise<TodoListType | null> {
   const res = await fetch(`/api/todo/${listId}`);
-  if (res.status === 404) {
-    dispatch({ type: ActionKind.NEW_LIST, id: listId });
-  } else {
-    const receivedTodoList = (await res.json()) as TodoListType;
-    dispatch({ type: ActionKind.LIST_RECEIVED, list: receivedTodoList });
-  }
+
+  if (res.status !== 200) return null;
+
+  return (await res.json()) as TodoListType;
 }
 
 const getCurrentOrNewListId = () => {
@@ -65,7 +54,14 @@ const TodoList = () => {
 
     // fetchLists();
 
-    fetchList(listId, dispatch).then(() => setLoading(false));
+    fetchList(listId).then((list) => {
+      if (!list) {
+        dispatch({ type: ActionKind.NEW_LIST, id: listId });
+      } else {
+        dispatch({ type: ActionKind.LIST_RECEIVED, list });
+      }
+      setLoading(false);
+    });
   }, [dispatch]);
 
   const { saved, list } = state;
