@@ -62,11 +62,26 @@ const SavingInput = ({ onDone, ...props }: SavingInputProps) => {
 const TodoList = () => {
   const state = useTodo();
   const dispatch = useTodoDispatch();
-  const [loading, setLoading] = useState(true);
-  const [willFocusLast, setWillFocusLast] = useState(false);
-  const listRef = useRef<HTMLUListElement | null>(null);
 
   if (!state || !dispatch) return null;
+
+  const [loading, setLoading] = useState(true);
+  const [willFocusLast, setWillFocusLast] = useState(false);
+  const [willSave, setWillSave] = useState(false);
+  const listRef = useRef<HTMLUListElement | null>(null);
+
+  const handleSubmit = async (
+    e?: React.FormEvent<HTMLFormElement>,
+  ): Promise<void> => {
+    e?.preventDefault();
+    const res = await fetch(`/api/todo/${state.list.id}`, {
+      method: "POST",
+      body: JSON.stringify(state.list),
+      headers: { "Content-Type": "application/json" },
+    });
+    const list = (await res.json()) as TodoListType;
+    dispatch({ type: ActionKind.LIST_SAVED, list });
+  };
 
   useEffect(() => {
     const { listId, isNew } = getCurrentOrNewListId();
@@ -103,20 +118,16 @@ const TodoList = () => {
     }
   }, [willFocusLast, listRef.current]);
 
-  const { saved, list } = state;
+  /**
+   * Save the list if set to be saved
+   */
+  useEffect(() => {
+    if (willSave) {
+      handleSubmit().then(() => setWillSave(false));
+    }
+  }, [willSave]);
 
-  const handleSubmit = async (
-    e?: React.FormEvent<HTMLFormElement>,
-  ): Promise<void> => {
-    e?.preventDefault();
-    const res = await fetch(`/api/todo/${state.list.id}`, {
-      method: "POST",
-      body: JSON.stringify(state.list),
-      headers: { "Content-Type": "application/json" },
-    });
-    const list = (await res.json()) as TodoListType;
-    dispatch({ type: ActionKind.LIST_SAVED, list });
-  };
+  const { saved, list } = state;
 
   return (
     <div id="todoListContainer">
@@ -147,13 +158,14 @@ const TodoList = () => {
                     <input
                       type="checkbox"
                       checked={i.done}
-                      onChange={(e) =>
+                      onChange={(e) => {
                         dispatch({
                           type: ActionKind.ITEM_STATE_CHANGED,
                           id: i.id,
                           checked: e.target.checked,
-                        })
-                      }
+                        });
+                        setWillSave(true);
+                      }}
                     />
                     <SavingInput
                       type="text"
@@ -172,37 +184,40 @@ const TodoList = () => {
                     <button
                       type="button"
                       className="todoItemButton"
-                      onClick={() =>
+                      onClick={() => {
                         dispatch({
                           type: ActionKind.ITEM_MOVED,
                           id: i.id,
                           oldPosition: i.order,
                           newPosition: i.order - 1,
-                        })
-                      }
+                        });
+                        setWillSave(true);
+                      }}
                     >
                       Move up
                     </button>
                     <button
                       type="button"
                       className="todoItemButton"
-                      onClick={() =>
+                      onClick={() => {
                         dispatch({
                           type: ActionKind.ITEM_MOVED,
                           id: i.id,
                           oldPosition: i.order,
                           newPosition: i.order + 1,
-                        })
-                      }
+                        });
+                        setWillSave(true);
+                      }}
                     >
                       Move down
                     </button>
                     <button
                       type="button"
                       className="todoItemButton"
-                      onClick={() =>
-                        dispatch({ type: ActionKind.ITEM_REMOVED, id: i.id })
-                      }
+                      onClick={() => {
+                        dispatch({ type: ActionKind.ITEM_REMOVED, id: i.id });
+                        setWillSave(true);
+                      }}
                     >
                       Remove
                     </button>
