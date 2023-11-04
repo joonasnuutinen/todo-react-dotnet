@@ -237,9 +237,6 @@ const TodoList = () => {
           >
             Add new item
           </button>
-          <button id="saveButton" type="submit" disabled={saved}>
-            Save changes
-          </button>
         </form>
       )}
     </div>
