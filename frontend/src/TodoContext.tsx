@@ -44,7 +44,7 @@ export const initialState: State = {
   saved: false,
 };
 
-export const reducer = (state: State, action: Action) => {
+export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case ActionKind.LIST_RECEIVED:
       return { ...state, list: action.list, saved: true };
@@ -128,8 +128,8 @@ export const reducer = (state: State, action: Action) => {
               return { ...i };
             }
           }),
-          saved: false,
         },
+        saved: false,
       };
     case ActionKind.LIST_SAVED:
       return { ...state, list: action.list, saved: true };
