@@ -63,6 +63,8 @@ const TodoList = () => {
   const state = useTodo();
   const dispatch = useTodoDispatch();
   const [loading, setLoading] = useState(true);
+  const [willFocusLast, setWillFocusLast] = useState(false);
+  const listRef = useRef<HTMLUListElement | null>(null);
 
   if (!state || !dispatch) return null;
 
@@ -85,6 +87,21 @@ const TodoList = () => {
       setLoading(false);
     });
   }, [dispatch]);
+
+  /**
+   * Focus the last item input if set to be focused
+   */
+  useEffect(() => {
+    if (willFocusLast && listRef.current) {
+      const itemInputs = [
+        ...listRef.current.querySelectorAll(".todoItemInput"),
+      ] as HTMLInputElement[];
+      if (itemInputs.length < 1) return;
+      const lastItemInput = itemInputs[itemInputs.length - 1];
+      lastItemInput.focus();
+      setWillFocusLast(false);
+    }
+  }, [willFocusLast, listRef.current]);
 
   const { saved, list } = state;
 
@@ -120,7 +137,7 @@ const TodoList = () => {
             }
             onDone={() => handleSubmit()}
           />
-          <ul id="itemList">
+          <ul id="itemList" ref={listRef}>
             {list.items
               ?.slice()
               .sort((a, b) => a.order - b.order)
@@ -138,7 +155,7 @@ const TodoList = () => {
                         })
                       }
                     />
-                    <input
+                    <SavingInput
                       type="text"
                       className="todoItemInput"
                       placeholder="New to-do item"
@@ -150,6 +167,7 @@ const TodoList = () => {
                           text: e.target.value,
                         })
                       }
+                      onDone={handleSubmit}
                     />
                     <button
                       type="button"
@@ -195,7 +213,10 @@ const TodoList = () => {
           <button
             id="addButton"
             type="button"
-            onClick={() => dispatch({ type: ActionKind.ITEM_ADDED })}
+            onClick={() => {
+              dispatch({ type: ActionKind.ITEM_ADDED });
+              setWillFocusLast(true);
+            }}
           >
             Add new item
           </button>
