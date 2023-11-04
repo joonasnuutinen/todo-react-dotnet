@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import TodoList from "./TodoList";
-import { TodoListType } from "./../types";
+import TodoList from ".";
+import { TodoListType } from "./../../types";
 
 test("save button is disabled when no unsaved changes are present", async () => {
   const todoList: TodoListType = {

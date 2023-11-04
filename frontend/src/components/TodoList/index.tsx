@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./TodoList.css";
-import { useTodo, useTodoDispatch, ActionKind } from "../TodoContext";
-import type { TodoListType } from "../types";
+import { useTodo, useTodoDispatch, ActionKind } from "../../TodoContext";
+import type { TodoListType } from "../../types";
 
 const isValidGuid = (candidate: string) => {
   const guidRegExp =
