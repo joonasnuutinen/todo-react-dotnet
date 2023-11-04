@@ -102,9 +102,9 @@ export const reducer = (state: State, action: Action): State => {
               id: crypto.randomUUID(),
               description: "",
               done: false,
-              order: -1,
+              order: Math.max(...state.list.items.map((_) => _.order)) + 1,
             },
-          ].map((item, index) => ({ ...item, order: index })),
+          ],
         },
         saved: false,
       };
