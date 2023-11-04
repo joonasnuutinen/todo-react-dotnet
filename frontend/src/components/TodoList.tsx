@@ -152,16 +152,16 @@ const TodoList = () => {
             {list.items
               ?.slice()
               .sort((a, b) => a.order - b.order)
-              .map((i) => (
-                <li key={i.id}>
+              .map(({ id, done, description, order }, i) => (
+                <li key={id}>
                   <div className="todoItemBlock">
                     <input
                       type="checkbox"
-                      checked={i.done}
+                      checked={done}
                       onChange={(e) => {
                         dispatch({
                           type: ActionKind.ITEM_STATE_CHANGED,
-                          id: i.id,
+                          id,
                           checked: e.target.checked,
                         });
                         setWillSave(true);
@@ -171,11 +171,11 @@ const TodoList = () => {
                       type="text"
                       className="todoItemInput"
                       placeholder="New to-do item"
-                      value={i.description}
+                      value={description}
                       onChange={(e) =>
                         dispatch({
                           type: ActionKind.ITEM_TEXT_CHANGED,
-                          id: i.id,
+                          id,
                           text: e.target.value,
                         })
                       }
@@ -187,12 +187,13 @@ const TodoList = () => {
                       onClick={() => {
                         dispatch({
                           type: ActionKind.ITEM_MOVED,
-                          id: i.id,
-                          oldPosition: i.order,
-                          newPosition: i.order - 1,
+                          id,
+                          oldPosition: order,
+                          newPosition: order - 1,
                         });
                         setWillSave(true);
                       }}
+                      disabled={i < 1}
                     >
                       Move up
                     </button>
@@ -202,12 +203,13 @@ const TodoList = () => {
                       onClick={() => {
                         dispatch({
                           type: ActionKind.ITEM_MOVED,
-                          id: i.id,
-                          oldPosition: i.order,
-                          newPosition: i.order + 1,
+                          id,
+                          oldPosition: order,
+                          newPosition: order + 1,
                         });
                         setWillSave(true);
                       }}
+                      disabled={i >= list.items.length - 1}
                     >
                       Move down
                     </button>
@@ -215,7 +217,7 @@ const TodoList = () => {
                       type="button"
                       className="todoItemButton"
                       onClick={() => {
-                        dispatch({ type: ActionKind.ITEM_REMOVED, id: i.id });
+                        dispatch({ type: ActionKind.ITEM_REMOVED, id });
                         setWillSave(true);
                       }}
                     >
