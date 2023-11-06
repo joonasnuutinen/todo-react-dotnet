@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import "./TodoList.css";
 import { useTodo, useTodoDispatch, ActionKind } from "../../TodoContext";
 import type { TodoListType } from "../../types";
+import SavingInput from "../SavingInput";
+import { TodoListItem } from ".";
 
 const isValidGuid = (candidate: string) => {
   const guidRegExp =
@@ -35,28 +37,6 @@ const getCurrentOrNewListId = () => {
     const newGuid = crypto.randomUUID();
     return { listId: newGuid, isNew: true };
   }
-};
-
-interface SavingInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  onDone: () => Promise<void>;
-}
-
-const SavingInput = ({ onDone, ...props }: SavingInputProps) => {
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  return (
-    <input
-      ref={inputRef}
-      onBlur={() => onDone()}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" && inputRef.current) {
-          e.preventDefault();
-          inputRef.current.blur();
-          e.target.dispatchEvent(new FocusEvent("blur"));
-        }
-      }}
-      {...props}
-    />
-  );
 };
 
 const TodoList = () => {
@@ -127,7 +107,7 @@ const TodoList = () => {
     }
   }, [willSave]);
 
-  const { saved, list } = state;
+  const { list } = state;
 
   return (
     <div id="todoListContainer">
@@ -146,85 +126,21 @@ const TodoList = () => {
                 name: e.target.value,
               })
             }
-            onDone={() => handleSubmit()}
+            onDoneEditing={() => handleSubmit()}
           />
           <ul id="itemList" ref={listRef}>
             {list.items
               ?.slice()
               .sort((a, b) => a.order - b.order)
-              .map(({ id, done, description, order }, i) => (
-                <li key={id}>
-                  <div className="todoItemBlock">
-                    <input
-                      type="checkbox"
-                      checked={done}
-                      onChange={(e) => {
-                        dispatch({
-                          type: ActionKind.ITEM_STATE_CHANGED,
-                          id,
-                          checked: e.target.checked,
-                        });
-                        setWillSave(true);
-                      }}
-                    />
-                    <SavingInput
-                      type="text"
-                      className="todoItemInput"
-                      placeholder="New to-do item"
-                      value={description}
-                      onChange={(e) =>
-                        dispatch({
-                          type: ActionKind.ITEM_TEXT_CHANGED,
-                          id,
-                          text: e.target.value,
-                        })
-                      }
-                      onDone={handleSubmit}
-                    />
-                    <button
-                      type="button"
-                      className="todoItemButton"
-                      onClick={() => {
-                        dispatch({
-                          type: ActionKind.ITEM_MOVED,
-                          id,
-                          oldPosition: order,
-                          newPosition: order - 1,
-                        });
-                        setWillSave(true);
-                      }}
-                      disabled={i < 1}
-                    >
-                      Move up
-                    </button>
-                    <button
-                      type="button"
-                      className="todoItemButton"
-                      onClick={() => {
-                        dispatch({
-                          type: ActionKind.ITEM_MOVED,
-                          id,
-                          oldPosition: order,
-                          newPosition: order + 1,
-                        });
-                        setWillSave(true);
-                      }}
-                      disabled={i >= list.items.length - 1}
-                    >
-                      Move down
-                    </button>
-                    <button
-                      type="button"
-                      className="todoItemButton"
-                      onClick={() => {
-                        dispatch({ type: ActionKind.ITEM_REMOVED, id });
-                        setWillSave(true);
-                      }}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </li>
+              .map((item, i) => (
+                <TodoListItem
+                  key={item.id}
+                  item={item}
+                  index={i}
+                  listLength={list.items.length}
+                  handleSubmit={handleSubmit}
+                  setWillSave={setWillSave}
+                />
               ))}
           </ul>
           <button
