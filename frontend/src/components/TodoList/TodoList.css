@@ -38,31 +38,8 @@
   justify-self: center;
 }
 
-.todoItemBlock {
-  border: 1px solid lightgray;
-  padding: 5px;
-  margin: 5px;
-  white-space: nowrap;
-}
-
-.todoItemInput {
-  margin-left: 3px;
-  margin-right: 3px;
-}
-
 #addButton {
   grid-area: buttonsleft;
   margin: 20px;
   padding: 10px;
-}
-
-#saveButton {
-  grid-area: buttonsright;
-  margin: 20px;
-  padding: 10px;
-}
-
-.todoItemButton {
-  margin-left: 5px;
-  margin-right: 5px;
 }

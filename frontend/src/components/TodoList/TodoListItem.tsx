@@ -2,6 +2,7 @@ import React from "react";
 import type { TodoItemType } from "../../types";
 import { useTodoDispatch, ActionKind } from "../../TodoContext";
 import SavingInput from "../SavingInput";
+import "./TodoListItem.css";
 
 interface TodoListItemProps {
   item: TodoItemType;

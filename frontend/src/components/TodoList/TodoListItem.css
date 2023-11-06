@@ -1,0 +1,16 @@
+.todoItemBlock {
+  border: 1px solid lightgray;
+  padding: 5px;
+  margin: 5px;
+  white-space: nowrap;
+}
+
+.todoItemInput {
+  margin-left: 3px;
+  margin-right: 3px;
+}
+
+.todoItemButton {
+  margin-left: 5px;
+  margin-right: 5px;
+}
