@@ -91,7 +91,13 @@ export const reducer = (state: State, action: Action): State => {
         },
         saved: false,
       };
-    case ActionKind.ITEM_ADDED:
+    case ActionKind.ITEM_ADDED: {
+      const maxOrderBeforeNewItem = Math.max(
+        ...state.list.items.map((_) => _.order),
+      );
+      const newItemOrder =
+        maxOrderBeforeNewItem === -Infinity ? 0 : maxOrderBeforeNewItem + 1;
+
       return {
         ...state,
         list: {
@@ -102,12 +108,13 @@ export const reducer = (state: State, action: Action): State => {
               id: crypto.randomUUID(),
               description: "",
               done: false,
-              order: Math.max(...state.list.items.map((_) => _.order)) + 1,
+              order: newItemOrder,
             },
           ],
         },
         saved: false,
       };
+    }
     case ActionKind.ITEM_MOVED:
       if (
         action.newPosition < 0 ||
